@@ -8,6 +8,13 @@
       "when": 1779706150047,
       "tag": "0000_grey_silver_samurai",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779706968295,
+      "tag": "0001_closed_sleepwalker",
+      "breakpoints": true
     }
   ]
 }
