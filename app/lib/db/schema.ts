@@ -1,16 +1,9 @@
 import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { TASK_PRIORITIES, TASK_STATUSES } from "~/features/tasks/types";
 
-export const taskStatusEnum = pgEnum("task_status", [
-  "todo",
-  "in_progress",
-  "done",
-]);
+export const taskStatusEnum = pgEnum("task_status", TASK_STATUSES);
 
-export const taskPriorityEnum = pgEnum("task_priority", [
-  "low",
-  "medium",
-  "high",
-]);
+export const taskPriorityEnum = pgEnum("task_priority", TASK_PRIORITIES);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
