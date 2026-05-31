@@ -1,4 +1,5 @@
-import { Form } from "react-router";
+import { useState, useEffect } from "react";
+import { useFetcher } from "react-router";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -20,8 +21,17 @@ type EditTaskDialogProps = {
 };
 
 export function EditTaskDialog({ task }: EditTaskDialogProps) {
+  const [open, setOpen] = useState(false);
+  const fetcher = useFetcher<{ success: boolean; error?: string }>();
+
+  useEffect(() => {
+    if (fetcher.data?.success) setOpen(false);
+  }, [fetcher.data]);
+
+  const isSubmitting = fetcher.state === "submitting";
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           Edit
@@ -36,7 +46,7 @@ export function EditTaskDialog({ task }: EditTaskDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <Form method="post" className="space-y-4">
+        <fetcher.Form method="post" className="space-y-4">
           <input type="hidden" name="intent" value="update-task" />
           <input type="hidden" name="taskId" value={task.id} />
 
@@ -86,11 +96,13 @@ export function EditTaskDialog({ task }: EditTaskDialogProps) {
               }
             />
           </div>
-
-          <Button type="submit" className="w-full">
-            Save changes
+          {fetcher.data?.error ? (
+            <p className="text-sm text-destructive">{fetcher.data.error}</p>
+          ) : null}
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save changes"}
           </Button>
-        </Form>
+        </fetcher.Form>
       </DialogContent>
     </Dialog>
   );
