@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/button";
 import type { Task } from "~/lib/db/schema";
 import { TaskPriorityBadge } from "./task-priority-badge";
 import { TaskStatusBadge } from "./task-status-badge";
+import { EditTaskDialog } from "./edit-task-dialog";
 
 type TaskCardProps = {
   task: Task;
@@ -74,7 +75,7 @@ export function TaskCard({ task }: TaskCardProps) {
               <Button size="sm">Done</Button>
             </Form>
           ) : null}
-
+          <EditTaskDialog task={task} />
           <Form method="post">
             <input type="hidden" name="intent" value="delete" />
 
