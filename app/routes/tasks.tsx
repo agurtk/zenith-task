@@ -17,6 +17,11 @@ import {
 import { getTasksByUserId } from "~/features/tasks/queries.server";
 import { createTaskSchema } from "~/features/tasks/validations";
 import { requireUserId } from "~/lib/session.server";
+import {
+  parseCreateTaskForm,
+  parseDeleteTaskForm,
+  parseUpdateTaskStatusForm,
+} from "~/features/tasks/task-form.server";
 
 export async function loader({ request }: { request: Request }) {
   const userId = await requireUserId(request);
@@ -28,58 +33,41 @@ export async function loader({ request }: { request: Request }) {
 export async function action({ request }: { request: Request }) {
   const userId = await requireUserId(request);
   const formData = await request.formData();
+
   const intent = String(formData.get("intent") || "create");
-  const rawData = {
-    title: String(formData.get("title") || ""),
-    description: String(formData.get("description") || ""),
-    status: "todo",
-    priority: String(formData.get("priority") || "medium"),
-    dueDate: String(formData.get("dueDate") || ""),
-  };
 
   try {
     if (intent === "delete") {
-      const taskId = formData.get("taskId");
+      const data = parseDeleteTaskForm(formData);
 
-      if (typeof taskId !== "string" || !taskId) {
-        return { error: "Task id is required" };
-      }
-
-      await deleteTask({ taskId, userId });
-
-      return { success: true };
-    }
-
-    if (intent === "update-status") {
-      const taskId = formData.get("taskId");
-
-      if (typeof taskId !== "string" || !taskId) {
-        return { error: "Task id is required" };
-      }
-
-      const status = String(formData.get("status") || "");
-
-      if (status !== "todo" && status !== "in_progress" && status !== "done") {
-        return { error: "Invalid status" };
-      }
-
-      await updateTaskStatus({
-        taskId,
+      await deleteTask({
+        taskId: data.taskId,
         userId,
-        status,
       });
 
       return { success: true };
     }
 
-    const parsedData = createTaskSchema.parse(rawData);
+    if (intent === "update-status") {
+      const data = parseUpdateTaskStatusForm(formData);
+
+      await updateTaskStatus({
+        taskId: data.taskId,
+        userId,
+        status: data.status,
+      });
+
+      return { success: true };
+    }
+
+    const data = parseCreateTaskForm(formData);
     await createTask({
       userId,
-      title: parsedData.title,
-      description: parsedData.description,
-      status: parsedData.status,
-      priority: parsedData.priority,
-      dueDate: parsedData.dueDate ? new Date(parsedData.dueDate) : undefined,
+      title: data.title,
+      description: data.description,
+      status: data.status,
+      priority: data.priority,
+      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
     });
 
     return { success: true };
