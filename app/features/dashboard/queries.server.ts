@@ -33,9 +33,9 @@ export async function getDashboardStats(userId: string) {
     );
 
   return {
-    total: total?.value,
-    completed: completed?.value,
-    pending: pending?.value,
-    overdue: overdue?.value,
+    total: total?.value ?? 0,
+    completed: completed?.value ?? 0,
+    pending: pending?.value ?? 0,
+    overdue: overdue?.value ?? 0,
   };
 }

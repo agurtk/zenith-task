@@ -1,9 +1,16 @@
 import { Form, useLoaderData } from "react-router";
 import { getDashboardStats } from "~/features/dashboard/queries.server";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 import { requireUserId } from "~/lib/session.server";
+
+import { DashboardStatCard } from "~/features/dashboard/components/dashborad-stat-card";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CircleDashed,
+  ListTodo,
+} from "lucide-react";
 
 export async function loader({ request }: { request: Request }) {
   const userId = await requireUserId(request);
@@ -17,7 +24,34 @@ export async function loader({ request }: { request: Request }) {
 }
 
 export default function DashboardPage() {
-  const { userId, stats } = useLoaderData<typeof loader>();
+  const { stats } = useLoaderData<typeof loader>();
+
+  const statCards = [
+    {
+      title: "Total Tasks",
+      value: stats.total,
+      description: "All tasks in your workspace",
+      icon: <ListTodo className="size-4" />,
+    },
+    {
+      title: "Completed",
+      value: stats.completed,
+      description: "Tasks marked as done",
+      icon: <CheckCircle2 className="size-4" />,
+    },
+    {
+      title: "Pending",
+      value: stats.pending,
+      description: "Tasks still in progress",
+      icon: <CircleDashed className="size-4" />,
+    },
+    {
+      title: "Overdue",
+      value: stats.overdue,
+      description: "Tasks past their due date",
+      icon: <AlertTriangle className="size-4" />,
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-muted/40 p-6">
@@ -39,44 +73,17 @@ export default function DashboardPage() {
           </Form>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Total Tasks</CardTitle>
-            </CardHeader>
-            <CardContent className="text-3xl font-bold">{stats.total}</CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Completed</CardTitle>
-            </CardHeader>
-            <CardContent className="text-3xl font-bold">{stats.completed}</CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Pending</CardTitle>
-            </CardHeader>
-            <CardContent className="text-3xl font-bold">{stats.pending}</CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Overdue</CardTitle>
-            </CardHeader>
-            <CardContent className="text-3xl font-bold">{stats.overdue}</CardContent>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {statCards.map((card) => (
+            <DashboardStatCard
+              key={card.title}
+              title={card.title}
+              value={card.value}
+              description={card.description}
+              icon={card.icon}
+            />
+          ))}
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Session Debug</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Logged in user id: {userId}
-          </CardContent>
-        </Card>
       </div>
     </main>
   );
