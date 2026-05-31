@@ -1,5 +1,5 @@
 import { Form, useLoaderData } from "react-router";
-
+import { getDashboardStats } from "~/features/dashboard/queries.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
@@ -8,13 +8,16 @@ import { requireUserId } from "~/lib/session.server";
 export async function loader({ request }: { request: Request }) {
   const userId = await requireUserId(request);
 
+  const stats = await getDashboardStats(userId);
+
   return {
     userId,
+    stats,
   };
 }
 
 export default function DashboardPage() {
-  const { userId } = useLoaderData<typeof loader>();
+  const { userId, stats } = useLoaderData<typeof loader>();
 
   return (
     <main className="min-h-screen bg-muted/40 p-6">
@@ -41,28 +44,28 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle>Total Tasks</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">0</CardContent>
+            <CardContent className="text-3xl font-bold">{stats.total}</CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle>Completed</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">0</CardContent>
+            <CardContent className="text-3xl font-bold">{stats.completed}</CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle>Pending</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">0</CardContent>
+            <CardContent className="text-3xl font-bold">{stats.pending}</CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle>Overdue</CardTitle>
             </CardHeader>
-            <CardContent className="text-3xl font-bold">0</CardContent>
+            <CardContent className="text-3xl font-bold">{stats.overdue}</CardContent>
           </Card>
         </div>
 
