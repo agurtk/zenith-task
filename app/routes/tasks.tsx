@@ -12,6 +12,7 @@ import { TasksEmptyState } from "~/features/tasks/components/tasks-empty-state";
 import {
   createTask,
   deleteTask,
+  updateTask,
   updateTaskStatus,
 } from "~/features/tasks/mutations.server";
 import { getTasksByUserId } from "~/features/tasks/queries.server";
@@ -20,6 +21,7 @@ import { requireUserId } from "~/lib/session.server";
 import {
   parseCreateTaskForm,
   parseDeleteTaskForm,
+  parseUpdateTaskForm,
   parseUpdateTaskStatusForm,
 } from "~/features/tasks/task-form.server";
 
@@ -57,6 +59,19 @@ export async function action({ request }: { request: Request }) {
         status: data.status,
       });
 
+      return { success: true };
+    }
+
+    if (intent === "update-task") {
+      const data = parseUpdateTaskForm(formData);
+      await updateTask({
+        taskId: data.taskId,
+        userId,
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        dueDate: data.dueDate ? new Date(data.dueDate) : null,
+      });
       return { success: true };
     }
 

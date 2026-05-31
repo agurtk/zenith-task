@@ -23,6 +23,15 @@ export const updateTaskStatusSchema = z.object({
   status: z.enum(TASK_STATUSES),
 });
 
+export const UpdateTaskSchema = z.object({
+  taskId: z.uuid({ error: "Invalid task id" }),
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  description: z.string().optional(),
+  priority: z.enum(TASK_PRIORITIES),
+  dueDate: z.string().optional(),
+});
+
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type DeleteTaskInput = z.infer<typeof deleteTaskSchema>;
 export type UpdateTaskStatusInput = z.infer<typeof updateTaskStatusSchema>;
+export type UpdateTaskInput = z.infer<typeof UpdateTaskSchema>;
